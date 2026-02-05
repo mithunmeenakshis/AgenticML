@@ -1,0 +1,344 @@
+{
+  "run_metadata": {
+    "agenticml_version": "0.1",
+    "run_time": "2025-07-12T06:02:09.520917",
+    "python_version": "3.13.2",
+    "os": "Windows-11-10.0.26120-SP0"
+  },
+  "data_overview": {
+    "num_rows": 891,
+    "num_columns": 12,
+    "missing_values": {
+      "PassengerId": 0,
+      "Survived": 0,
+      "Pclass": 0,
+      "Name": 0,
+      "Sex": 0,
+      "Age": 177,
+      "SibSp": 0,
+      "Parch": 0,
+      "Ticket": 0,
+      "Fare": 0,
+      "Cabin": 687,
+      "Embarked": 2
+    },
+    "class_balance": {
+      "0": 0.6161616161616161,
+      "1": 0.3838383838383838
+    },
+    "feature_types": {
+      "numerical": [
+        "PassengerId",
+        "Survived",
+        "Pclass",
+        "Age",
+        "SibSp",
+        "Parch",
+        "Fare"
+      ],
+      "categorical": [
+        "Name",
+        "Sex",
+        "Ticket",
+        "Cabin",
+        "Embarked"
+      ]
+    }
+  },
+  "task": "classification",
+  "input_csv": "titanic.csv",
+  "target_column": "Survived",
+  "engineered_features": [
+    {
+      "feature": "Age_Squared",
+      "description": "Age squared for non-linear relationship",
+      "code": "X['Age_Squared'] = X['Age'] ** 2",
+      "status": "success"
+    },
+    {
+      "feature": "Pclass_One_Hot",
+      "description": "One-hot encoding of Pclass column",
+      "code": "X[['Pclass_One_Hot']] = pd.get_dummies(X['Pclass'], prefix='Pclass')",
+      "status": "success"
+    },
+    {
+      "feature": "Fare_Log_Scaled",
+      "description": "Log of Fare column scaled to have mean 0 and std 1",
+      "code": "X['Fare_Log_Scaled'] = (np.log(X['Fare']) - X['Fare'].mean()) / X['Fare'].std()",
+      "status": "success"
+    },
+    {
+      "feature": "Sex_Ratio",
+      "description": "Ratio of male to female passengers",
+      "code": "X['Sex_Ratio'] = X.groupby('Sex')['PassengerId'].transform('count').div(X.groupby('Sex')['PassengerId'].transform('count').reset_index()['PassengerId'][0])",
+      "status": "success (retry)"
+    },
+    {
+      "feature": "Cabin_Level",
+      "description": "Level of Cabin column (e.g. first letter, first two letters, etc.)",
+      "code": "X['Cabin_Level'] = X['Cabin'].str[:1]",
+      "status": "success (retry)"
+    },
+    {
+      "feature": "Fare_Per_Person",
+      "description": "Fare divided by SibSp and Parch",
+      "code": "X['Fare_Per_Person'] = X['Fare'] / (X['SibSp'] + X['Parch'])",
+      "status": "success"
+    },
+    {
+      "feature": "Age_Binned",
+      "description": "Age binned into 5-year intervals",
+      "code": "X['Age_Binned'] = pd.cut(X['Age'], bins=[0, 20, 25, 30, 35, 40, 100], labels=[f'20-{i}' for i in range(20, 40, 5)])",
+      "status": "failed after retry: Bin labels must be one fewer than the number of bin edges"
+    },
+    {
+      "feature": "Sex_Pclass_Interaction",
+      "description": "Interaction between Sex and Pclass",
+      "code": "X['Sex_Pclass_Interaction'] = X['Sex'].map({'male': 0, 'female': 1}).astype(int) * X['Pclass'].astype(int)",
+      "status": "success"
+    },
+    {
+      "feature": "Cabin_Level_Squared",
+      "description": "Cabin_Level squared",
+      "code": "X['Cabin_Level_Squared'] = X['Cabin_Level'].astype(float)**2",
+      "status": "failed after retry: could not convert string to float: 'C'"
+    },
+    {
+      "feature": "Embarked_Squared",
+      "description": "Embarked squared",
+      "code": "X['Embarked_Squared'] = X['Embarked'].astype('int').apply(lambda x: x**2)",
+      "status": "failed after retry: invalid literal for int() with base 10: 'S'"
+    },
+    {
+      "feature": "Age_Squared_Root",
+      "description": "Square root of Age column",
+      "code": "X['Age_Squared_Root'] = X['Age'].apply(lambda x: x**0.5)",
+      "status": "success"
+    },
+    {
+      "feature": "Fare_Per_Person_Log",
+      "description": "Log of Fare_Per_Person column",
+      "code": "X['Fare_Per_Person_Log'] = np.log(X['Fare_Per_Person'])",
+      "status": "success"
+    },
+    {
+      "feature": "Sex_Pclass_Interaction_Ratio",
+      "description": "Ratio of Sex_Pclass_Interaction to Pclass",
+      "code": "X['Sex_Pclass_Interaction_Ratio'] = X['Sex_Pclass_Interaction'] / X['Pclass']",
+      "status": "success"
+    },
+    {
+      "feature": "Cabin_Level_Ratio",
+      "description": "Ratio of Cabin_Level to Cabin",
+      "code": "X['Cabin_Level_Ratio'] = X['Cabin_Level'].astype(float) / X['Cabin'].astype(float)",
+      "status": "failed after retry: could not convert string to float: 'C'"
+    },
+    {
+      "feature": "Pclass_Squared",
+      "description": "Square of Pclass column",
+      "code": "X['Pclass_Squared'] = X['Pclass'] ** 2",
+      "status": "success"
+    },
+    {
+      "feature": "Fare_Per_Person_Squared",
+      "description": "Fare divided by PassengerId squared",
+      "code": "X['Fare_Per_Person_Squared'] = X['Fare'] / X['PassengerId'] ** 2",
+      "status": "success"
+    },
+    {
+      "feature": "Sex_Pclass_Interaction_Squared",
+      "description": "Square of Sex_Pclass_Interaction",
+      "code": "X['Sex_Pclass_Interaction_Squared'] = X['Sex_Pclass_Interaction'] ** 2",
+      "status": "success"
+    },
+    {
+      "feature": "Age_Squared_Root_Log",
+      "description": "Log of Age_Squared_Root",
+      "code": "X['Age_Squared_Root_Log'] = np.log(X['Age_Squared_Root'])",
+      "status": "success"
+    },
+    {
+      "feature": "Pclass_Squared_Root",
+      "description": "Square root of Pclass_Squared",
+      "code": "X['Pclass_Squared_Root'] = X['Pclass_Squared'] ** 0.5",
+      "status": "success"
+    },
+    {
+      "feature": "Cabin_Level_Sex_Interaction",
+      "description": "Interaction between Cabin_Level and Sex",
+      "code": "X['Cabin_Level_Sex_Interaction'] = X['Cabin_Level'].astype(str) + '_' + X['Sex'].astype(str)",
+      "status": "success"
+    }
+  ],
+  "selected_features": [
+    "Name",
+    "Ticket",
+    "Fare",
+    "Sex_Pclass_Interaction",
+    "Fare_Per_Person_Squared",
+    "Sex_Pclass_Interaction_Squared",
+    "Cabin_Level_Sex_Interaction"
+  ],
+  "model_results": [
+    {
+      "model": "logistic",
+      "score": 0.7877094972067039,
+      "cv_scores": [
+        0.7941176470588235,
+        0.7890295358649789,
+        0.7679324894514767
+      ]
+    },
+    {
+      "model": "svc",
+      "score": 0.776536312849162,
+      "cv_scores": [
+        0.8025210084033614,
+        0.7932489451476793,
+        0.7721518987341772
+      ]
+    },
+    {
+      "model": "rf",
+      "score": 0.8324022346368715,
+      "cv_scores": [
+        0.7899159663865546,
+        0.7679324894514767,
+        0.7805907172995781
+      ]
+    },
+    {
+      "model": "logistic",
+      "score": 0.7597765363128491,
+      "cv_scores": [
+        0.7773109243697479,
+        0.8059071729957806,
+        0.759493670886076
+      ]
+    },
+    {
+      "model": "svc",
+      "score": 0.770949720670391,
+      "cv_scores": [
+        0.7983193277310925,
+        0.8227848101265823,
+        0.7637130801687764
+      ]
+    },
+    {
+      "model": "rf",
+      "score": 0.8044692737430168,
+      "cv_scores": [
+        0.7941176470588235,
+        0.8270042194092827,
+        0.7805907172995781
+      ]
+    },
+    {
+      "model": "logistic",
+      "score": 0.7988826815642458,
+      "cv_scores": [
+        0.7773109243697479,
+        0.7637130801687764,
+        0.8354430379746836
+      ]
+    },
+    {
+      "model": "svc",
+      "score": 0.8100558659217877,
+      "cv_scores": [
+        0.7941176470588235,
+        0.7721518987341772,
+        0.7974683544303798
+      ]
+    },
+    {
+      "model": "rf",
+      "score": 0.8435754189944135,
+      "cv_scores": [
+        0.7857142857142857,
+        0.8143459915611815,
+        0.8438818565400844
+      ]
+    },
+    {
+      "model": "logistic",
+      "score": 0.7653631284916201,
+      "cv_scores": [
+        0.8151260504201681,
+        0.7932489451476793,
+        0.7721518987341772
+      ]
+    },
+    {
+      "model": "svc",
+      "score": 0.776536312849162,
+      "cv_scores": [
+        0.8403361344537815,
+        0.7932489451476793,
+        0.7763713080168776
+      ]
+    },
+    {
+      "model": "rf",
+      "score": 0.8156424581005587,
+      "cv_scores": [
+        0.8445378151260504,
+        0.7805907172995781,
+        0.8059071729957806
+      ]
+    },
+    {
+      "model": "logistic",
+      "score": 0.7430167597765364,
+      "cv_scores": [
+        0.8025210084033614,
+        0.8185654008438819,
+        0.7552742616033755
+      ]
+    },
+    {
+      "model": "svc",
+      "score": 0.7486033519553073,
+      "cv_scores": [
+        0.8151260504201681,
+        0.8016877637130801,
+        0.7721518987341772
+      ]
+    },
+    {
+      "model": "rf",
+      "score": 0.8268156424581006,
+      "cv_scores": [
+        0.8235294117647058,
+        0.8354430379746836,
+        0.7974683544303798
+      ]
+    }
+  ],
+  "best_model": {
+    "name": "rf",
+    "score": 0.8435754189944135,
+    "params": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "class_weight": null,
+      "criterion": "gini",
+      "max_depth": 10,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 1,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 200,
+      "n_jobs": null,
+      "oob_score": false,
+      "random_state": null,
+      "verbose": 0,
+      "warm_start": false
+    }
+  }
+}
